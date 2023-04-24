@@ -8,7 +8,7 @@ This is a .NET 6 web application for small businesses to manage tender documenta
 
 • 'InzynierkaAPITest': This folder contains the test project for the API. It includes integration tests for the controllers. 
 ## Features
-• The Przetargi web application comes with the following features:
+The Przetargi web application comes with the following features:
 
 • Tender Documentation Management: The application allows users to manage their tender documentation by uploading, downloading, and deleting files. The files are stored in Azure Blob Storage for easy access and scalability.
 
