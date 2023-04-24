@@ -25,7 +25,7 @@ In order to access the application enter test user credentials login: User1, pas
 
 Please note that the demo may not include all the features mentioned above, and some features may be limited.
 
-##Project in Action
+## Project in Action
 Here are some GIFs that demonstrate how the project works:
 
 Work in progress...
