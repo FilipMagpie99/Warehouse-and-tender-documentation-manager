@@ -19,7 +19,8 @@ The Przetargi web application comes with the following features:
 • Notification System: The application allows users to receive notifications to email about incoming projects. 
 
 ## Demo
-A demo of the application is available at https://przetargi.azurewebsites.net/ .
+A demo of the application is available at https://przetargi.azurewebsites.net/ 
+
 In order to access the application enter test user credentials login: User1, password: User1.
 Please note that the demo may not include all the features mentioned above, and some features may be limited.
 
