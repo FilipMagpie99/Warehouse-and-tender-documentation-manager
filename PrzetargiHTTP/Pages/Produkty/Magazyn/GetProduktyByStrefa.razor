@@ -1,0 +1,145 @@
+﻿@page "/getproduktybystrefa/{idStrefy}"
+@using InzynierkaAPI
+@using PrzetargiHTTP.Data
+@using InzynierkaAPI.Models
+@inject ProduktyService produktyService
+@inject PrzetargiService przetargiService
+@inject NavigationManager NavManager
+@inject IJSRuntime jsr
+<h3>Katalog produktów</h3>
+<button class="btn btn-primary" @onclick="AddProdukt">Dodaj nowy produkt</button>
+
+@if (produkty == null)
+{
+	<p><em>Loading...</em></p>
+	
+}
+else
+{
+	<nav class="navbar navbar-light bg-light justify-content-between">
+		<EditForm Model="parametr">
+			<input class="form-control mr-sm-2" type="search" placeholder="Nazwa" @bind-value="parametr.nazwaProduktu" aria-label="Search">
+			<input class="form-control mr-sm-2" type="search" placeholder="Kategoria" @bind-value="parametr.typProduktu" aria-label="Search">
+			<input class="form-control mr-sm-2" type="search" placeholder="Dostawca" @bind-value="parametr.dostawca" aria-label="Search">
+			<input class="form-control mr-sm-2" type="search" placeholder="Producent" @bind-value="parametr.producent" aria-label="Search">
+			<button class="btn btn-success my-2 my-sm-0 mt-2" type="submit" @onclick="async () => await FindProdukty(parametr.nazwaProduktu,parametr.typProduktu,parametr.producent)">Szukaj <i class="fa fa-search"></i></button>
+			<button class="btn btn-danger my-2 my-sm-0 mt-2" type="submit" @onclick="async () => await FindProdukty(null,null,null)">Resetuj <i class="fa fa-refresh"></i></button>
+		</EditForm>
+	</nav>
+	<table class="mt-2">
+		<thead>
+			<tr>
+				
+				
+				<th>Nazwa</th>
+				<th>Jednostka miary</th>
+				<th>Ilość</th>
+				<th>Kategoria</th>
+				<th>Producent</th>
+				<th> </th>
+		
+			</tr>
+		</thead>
+		<tbody>
+
+			@foreach (var produkt in produkty)
+			{
+				<tr>
+
+					
+					<td>@produkt.Nazwa </td>
+					<td>@produkt.JednostkaMiary</td>
+					<td>@produkt.Suma</td>
+					<td>@produkt.TypProduktu</td>
+					<td>@produkt.Producent.Nazwa</td>
+					<td><button class="btn btn-primary" @onclick="() => GetByIdProduktu(produkt.Id)">Zmień stan magazynowy</button></td>
+					<td><button class="btn btn-danger" @onclick="() => Delete(produkt.Id)">Usuń</button></td>
+				</tr>
+			}
+		</tbody>
+	</table>
+
+	<div class="container">
+		<div class="row">
+			<div class="col" />
+			<div class="col"><button class="btn oi oi-arrow-left" @onclick="PrevPage"></button></div>
+			<div class="col"><p>@Strona</p></div>
+			<div class="col">	<button class="btn oi oi-arrow-right" @onclick="NextPage"></button></div>
+		</div>
+	</div>
+
+}
+
+@code {
+	private Produkt[] produkty;
+	public class Parametr
+	{
+		public string nazwaProduktu { get; set; }
+		public string typProduktu { get; set; }
+		public string dostawca { get; set; }
+		public string producent { get; set; }
+	}
+	Parametr parametr = new();
+	public string p { get; set; }
+	public int ilosc { get; set; }
+	public int Strona
+	{
+		get => strona;
+		set
+		{
+			if (value < 1)
+			{
+				return;
+			}
+			strona = value;
+			GetAll(null, null);
+		}
+	}
+	private int strona = 1;
+
+	private void NextPage() => Strona++;
+	private void PrevPage() => Strona--;
+	[Parameter]
+	public string idStrefy { get; set; }
+
+	private async void GetAll(MouseEventArgs e, object sender)
+	{
+		produkty = null;
+		StateHasChanged();
+		await OnInitializedAsync();
+		StateHasChanged();
+	}
+
+	private void NavigateToMagazyn(int id)
+	{
+		NavManager.NavigateTo($"/Magazyn/{id}");
+	}
+
+	private void GetByIdProduktu( int id) { 
+
+		NavManager.NavigateTo($"/getprodukt/{id}");
+	}
+
+	private void AddProdukt(){
+		NavManager.NavigateTo("/AddProdukt");
+	}
+	private async Task Delete(int id)
+	{
+		await produktyService.DeleteProdukt(id);
+		produkty = null;
+		await OnInitializedAsync();
+	}
+	protected override async Task OnInitializedAsync()
+	{
+		if (przetargiService.isLogged == false)
+			NavManager.NavigateTo("/");
+
+		produkty = await produktyService.GetProduktyByStrefa(Strona,idStrefy);
+	}
+	private async Task FindProdukty(string nazwaProduktu, string typProduktu, string producent)
+	{
+		produkty = await produktyService.FindProdukt(Strona, nazwaProduktu, typProduktu, producent);
+	}
+
+
+}

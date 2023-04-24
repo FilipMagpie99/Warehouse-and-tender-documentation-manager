@@ -1,0 +1,65 @@
+﻿@page "/addmagazyn"
+@using InzynierkaAPI
+@using InzynierkaAPI.Models
+@using PrzetargiHTTP.Data
+@inject ProduktyService produktyService;
+@inject PrzetargiService przetargiService;
+@inject NavigationManager NavManager
+
+<EditForm Model="@magazyn" OnValidSubmit="@HandleValidSubmit" class="form-inline border border-dark rounded shadow">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div class="modal-header bg-info">
+		<h3 class="modal-title" id="exampleModalLabel">Nowy magazyn</h3>
+	</div>
+		<div class="row justify-content-center">
+			<div class="col-7">
+				<h5 class="mt-2">Nazwa magazynu</h5>
+				<InputText @bind-Value="magazyn.Nazwa" class="form-control" name="Nazwafirmy" />
+			</div>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-7">
+				<h5 class="mt-2">Ulica</h5>
+				<InputText @bind-Value="magazyn.Ulica" class="form-control" name="Nip" />
+			</div>
+		</div>
+	<div class="row justify-content-center">
+		<div class="col-7">
+			<h5 class="mt-2">Numer domu</h5>
+			<InputText class="form-control bg-light" @bind-Value="magazyn.NrDomu" />
+		</div>
+	</div>
+	<div class="row justify-content-center">
+		<div class="col-7">
+			<h5 class="mt-2">Kod pocztowy</h5>
+			<InputText class="form-control bg-light" @bind-Value="magazyn.KodPocztowy" />
+		</div>
+	</div>
+	<div class="row justify-content-center">
+		<div class="col-7">
+			<h5 class="mt-2">Miejscowosc</h5>
+			<InputText class="form-control bg-light" @bind-Value="magazyn.Miejscowosc" />
+		</div>
+	</div>
+		<div class="row justify-content-center">
+			<div class="col-7">
+				<button class="btn btn-info mt-3 " type="submit">Utwórz</button>
+		</div>
+		</div>
+		<p class="mt-2"></p>
+</EditForm>
+
+@code {
+	private Magazyn magazyn = new();
+
+	private async Task HandleValidSubmit(){
+		await produktyService.AddMagazyn(magazyn);
+		NavManager.NavigateTo("/addprodukt");
+	}
+	protected override async Task OnInitializedAsync()
+	{
+		if (przetargiService.isLogged == false)
+			NavManager.NavigateTo("/");
+	}
+}

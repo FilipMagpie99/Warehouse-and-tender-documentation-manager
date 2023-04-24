@@ -1,0 +1,330 @@
+﻿@page "/przetargi"
+@using InzynierkaAPI
+@using PrzetargiHTTP.Data
+@using InzynierkaAPI.Models
+@inject PrzetargiService ForecastService
+@inject NavigationManager NavManager
+@inject IJSRuntime jsr
+
+
+
+
+@if (przetargi == null)
+{
+	<div class="d-flex align-items-center justify-content-center" style="height: 80vh">
+		<div style="max-width:500px;">
+			<p><h4> <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Ładowanie...</h4></p>
+		</div>
+	</div>
+}
+else
+{
+	<div class="card">
+		<h2 class="card-header text-dark" style="background-color: #FFC500 ;">Przetargi</h2>
+
+		<div class="row">
+			<div class="col ">
+				<button class="btn btn-primary ms-2 mt-3" @onclick="AddPrzetarg">Dodaj przetarg</button>
+			</div>
+			<div class="col"></div>
+
+			<div class="col">
+				<EditForm Model="parametr">
+					<input class="form-control mr-sm-2 mt-3" type="search" placeholder="Szukaj przetargu..." @bind-value="parametr.nazwa" aria-label="Search">
+					<InputSelect @bind-Value="parametr.rok" id="wystawcaIndex" class="form-control">
+						<option value="" >Termin wysłania - rok</option>
+						@foreach (var rok in lata)
+						{
+							<option value="@rok.Key">@rok.Value</option>
+
+						}
+					</InputSelect>
+					<InputSelect @bind-Value="parametr.miesiac" id="wystawcaIndex" class="form-control">
+						<option value="">Termin wysłania - miesiąc</option>
+						@foreach (var miesiac in miesiace)
+						{
+							<option value="@miesiac.Key">@miesiac.Value</option>
+
+						}
+					</InputSelect>			
+					<InputSelect @bind-Value="parametr.status" id="wystawcaIndex" class="form-control">
+
+						<option value="Niezweryfikowany"> Niezweryfikowany</option>
+						<option value="Wybrany"> Wybrany</option>
+						<option value="Odrzucony"> Odrzucony</option>
+						<option value="Wyslany"> Wyslany</option>
+						<option value="Anulowany"> Anulowany</option>
+						<option value="Realizowany"> Realizowany</option>
+						<option value="Przegrany"> Przegrany</option>
+						<option value="Zakonczony"> Zakonczony</option>
+
+
+					</InputSelect>
+					<div class="mt-2"></div>
+					<button class="btn btn-secondary my-2 my-sm-0 mt-3" type="submit" @onclick="async () => await FindPrzetarg(string.IsNullOrEmpty(parametr.rok)?0:int.Parse(parametr.rok),parametr.nazwa,string.IsNullOrEmpty(parametr.miesiac)?0:int.Parse(parametr.miesiac),parametr.status)">Szukaj <i class="fa fa-search"></i></button>
+					<button class="btn btn-secondary my-2 my-sm-0 mt-3" type="submit" @onclick=@Reset>Resetuj <i class="fa fa-refresh"></i></button>
+				</EditForm>
+
+			</div>
+			<div class="col"></div>
+			@*				<label>Sortuj: </label>
+		<select @bind="SelectedSort">
+		<option value="old">Data utworzenia - najnowsze</option>
+		<option value="new">Data utworzenia - najstarsze</option>
+		<option value="ascfirma">Organizator przetargu - A-Z</option>
+		<option value="descfirma">Organizator przetargu - Z-A</option>
+		</select>
+		<div class="d-flex align-items-center">*@
+			<div class="col mt-3 me-2">
+
+				<EditForm Model="itemsOnPage">
+					<label>Ilość przetargów na stronie: </label>
+					<InputSelect id="items" @bind-Value=itemsOnPage class="form-control" itemid="a">
+						<option value="5"> 5</option>
+						<option value="10"> 10</option>
+						<option value="20"> 20</option>
+						<option value="50"> 50</option>
+						<option value="100"> 100</option>
+					</InputSelect>
+					<button class="btn btn-primary mt-2" @onclick="async () => await OnValueChanged(itemsOnPage)">Zmień</button>
+				</EditForm>
+			</div>
+
+		</div>
+
+		<div class="row mt-2"></div>
+		<div class="mt-2"></div>
+
+
+
+		<table>
+			<thead>
+				<tr>
+
+
+					<th class="text-dark" style="background-color: #FFC500 ;">Przedmiot ogłoszenia</th>
+					<th class="text-dark" style="background-color: #FFC500 ;">Organizator</th>
+					<th class="text-dark" style="background-color: #FFC500 ;">Data wystawienia</th>
+					<th class="text-dark" style="background-color: #FFC500 ;">Termin wysłania</th>
+					<th class="text-dark" style="background-color: #FFC500 ;">Lokalizacja</th>
+					<th class="text-dark" style="background-color: #FFC500 ;">Status</th>
+					<th class="text-dark" style="background-color: #FFC500 ;"> </th>
+
+
+				</tr>
+			</thead>
+			<tbody>
+
+				@foreach (var przetarg in przetargi)
+				{
+					<tr>
+
+						<td>@przetarg.PrzedmiotOgloszenia</td>
+						<td><button class="btn-linker btn-link" @onclick="()=>GetWystawcabyId(przetarg.WystawcaPrzetarguId)">@przetarg.WystawcaPrzetargu?.Nazwa</button></td>
+						<td>@przetarg.DataUtworzenia</td>
+						<td>@przetarg.DataPrzetargu</td>
+						<td>@przetarg.Lokalizacja</td>
+						<td><span class="@ChangeColor(przetarg.Status,przetarg)">@przetarg.Status</span></td>
+						<td><button class="btn btn-primary btn-sm" @onclick="() => GetbyId(przetarg.Id)">Szczegóły</button></td>
+						@*<button class="btn btn-danger" @onclick="() => Delete(przetarg.Id)">Usuń</button></td>*@
+
+					</tr>
+				}
+			</tbody>
+		</table>
+
+		<div class="container">
+			<div class="row">
+				<div class="col">
+				</div>
+				<div class="col text-center">
+					<button class="btn oi oi-arrow-left" @onclick="PrevPage"></button>
+				</div>
+				<div class="col text-center">
+					<p class=" custom-font custom-size">@Strona</p>
+				</div>
+				<div class="col text-center">
+					<button class="btn oi oi-arrow-right" @onclick="NextPage"></button>
+				</div>
+				<div class="col">
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+}
+
+@code {
+	Dictionary<string, string> lata = new Dictionary<string, string>()
+{
+	{"2015", "2015"},
+	{"2016", "2016"},
+	{"2017", "2017"},
+	{"2018", "2018"},
+	{"2019", "2019"},
+	{"2020", "2020"},
+	{"2021", "2021"},
+	{"2022", "2022"},
+	{"2023", "2023"},
+	{"2024", "2024"},
+	{"2025", "2025"}
+};
+	Dictionary<string, string> miesiace = new Dictionary<string, string>()
+{
+	{"01", "Styczeń"},
+	{"02", "Luty"},
+	{"03", "Marzec"},
+	{"04", "Kwiecień"},
+	{"05", "Maj"},
+	{"06", "Czerwiec"},
+	{"07", "Lipiec"},
+	{"08", "Sierpień"},
+	{"09", "Wrzesień"},
+	{"10", "Październik"},
+	{"11", "Listopad"},
+	{"12", "Grudzień"}
+};
+	private string selectedSort;
+	public string SelectedSort
+	{
+		get{ return selectedSort; }
+		set
+		{
+			selectedSort = value;
+			selectedSortDictionary[selectedSort]();
+		}
+	}
+	Dictionary<string, Action> selectedSortDictionary;
+	public class Parametr {
+		public string nazwa { get; set; }
+		public string rok { get; set; }
+		public string miesiac { get; set; }
+		public string status { get; set; }
+	}
+	Parametr parametr = new();
+	public EventCallback
+	<string> OnSearch { get; set; }
+	private static Przetarg[] przetargi;
+	private static Przetarg[] przetargiLastPage;
+	private int ostatniaStrona { get; set; }
+	private int itemsOnPage { get; set; } = 5;
+	private int iloscPrzetargow { get; set; }
+
+	public string p { get; set; }
+	public int Strona { 
+		get => strona;  
+		set {
+			if(value<1){
+				return;
+			}
+			if (value > ostatniaStrona)
+			{
+				return;
+			}
+			strona = value;
+			GetAll(null,null);
+		}
+	}
+	private int strona = 1;
+
+	private void NextPage() => Strona++;
+	private void PrevPage() => Strona--;
+
+	private async Task OnValueChanged(int value)
+	{
+		await ForecastService.ChangeNumberOfItems(value);
+		await OnInitializedAsync();
+		StateHasChanged();
+	}
+
+	public async void Reset()
+	{
+		parametr.rok = null;
+		parametr.nazwa = null;
+		parametr.miesiac = null;
+		parametr.status = null;
+		await FindPrzetarg(0, null, 0, null);
+		StateHasChanged();
+	}
+
+	private void GetbyId(int id) {
+
+		NavManager.NavigateTo($"/przetargi/{id}");
+	}
+	private void AddPrzetarg(){
+		NavManager.NavigateTo("/addprzetarg");
+	}	
+
+	private void GetWystawcabyId(int id)
+	{
+		NavManager.NavigateTo($"/Wystawca/{id}");
+	}
+
+	private async Task Delete(int id)
+	{
+		await ForecastService.DeletePrzetarg(id);
+		przetargi = null;
+		await OnInitializedAsync();
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (ForecastService.isLogged == false)
+			NavManager.NavigateTo("/");
+		przetargi = await ForecastService.GetAllPrzetargi(Strona);
+		przetargi = przetargi.OrderByDescending(s => s.DataUtworzenia).ToArray();
+		przetargiLastPage = await ForecastService.GetPrzetargiForLastPage();
+		iloscPrzetargow = przetargiLastPage.Length;
+		ostatniaStrona = (int)Math.Ceiling((double)iloscPrzetargow / itemsOnPage);
+		
+		selectedSortDictionary = new Dictionary<string, Action>
+			{
+				["old"] = () => przetargi = przetargi.OrderByDescending(s => s.DataUtworzenia).ToArray(),
+				["new"] = () => przetargi = przetargi.OrderBy(s => s.DataUtworzenia).ToArray(),
+				["ascfirma"] = () => przetargi = przetargi.OrderBy(s => s.WystawcaPrzetargu.Nazwa).ToArray(),
+				["descfirma"] = () => przetargi = przetargi.OrderByDescending(s => s.WystawcaPrzetargu.Nazwa).ToArray()
+			};
+
+	}
+
+	private async void GetAll(MouseEventArgs e,object sender)
+	{
+		przetargi = null;
+		StateHasChanged();
+		await OnInitializedAsync();
+		StateHasChanged();
+	}
+
+	private async Task FindPrzetarg(int rok, string nazwa, int miesiac, string status) {
+		przetargi = await ForecastService.FindPrzetargs(Strona,rok, nazwa, miesiac,status);
+	}	
+
+	private string ChangeColor(Status status, Przetarg przetarg){
+		switch(przetarg.Status){
+			case Status.Niezweryfikowany:
+				return "badge bg-primary";
+			case Status.Wybrany:
+				return "badge bg-info";
+			case Status.Wyslany:
+				return "badge bg-warning";
+			case Status.Odrzucony:
+				return "badge bg-secondary";
+			case Status.Anulowany:
+				return "badge bg-danger";
+			case Status.Realizowany:
+				return "badge bg-success";
+			case Status.Przegrany:
+				return "badge bg-danger";
+			case Status.Zakonczony:
+				return "badge bg-dark";
+			default:
+				return "badge bg-primary";
+		}
+		
+
+	}
+
+}

@@ -1,0 +1,104 @@
+﻿@page "/addprodukt"
+@using InzynierkaAPI
+@using InzynierkaAPI.Models
+@using PrzetargiHTTP.Data
+@inject ProduktyService produktyService
+@inject PrzetargiService przetargiService
+@inject NavigationManager NavManager
+
+<div class="card">
+	<h3 class="card-header text-white bg-primary">Nowy produkt</h3>
+<EditForm Model="@produkt" OnValidSubmit="async () => await HandleValidSubmit()" class="form-inline  rounded shadow">
+    <div class="card-body">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+
+
+
+                    <h5 class="mt-1">Producent</h5>
+      <InputSelect @bind-Value="produkt.ProducentId" id="wystawcaIndex" class="form-control">
+                    <option value="" disabled selected hidden>Wybierz producenta...</option>
+                    @if (producenci != null)
+                        {
+                            @foreach (var producent in producenci)
+                            {
+                                    <option  value="@producent.Id"> @producent.Nazwa</option>
+
+                            }
+
+                        }
+        </InputSelect>
+                <input type="button" class="btn btn-link" value="Dodaj nowego producenta" @onclick="AddProducent" />
+	          
+
+
+		<h5 class="mt-1">Nazwa produktu</h5><InputText @bind-Value=produkt.Nazwa  class="form-control" name="Nazwa firmy" /> 
+		<h5 class="mt-1">Jednostka miary</h5> <InputText @bind-Value=produkt.JednostkaMiary class="form-control" name="JednostkaMiary" /> 
+		<h5 class="mt-1">Typ produktu</h5> <InputText @bind-Value=produkt.TypProduktu class="form-control" name="TypProduktu" />
+
+
+
+
+
+
+            <div class="mt-1">  <button class="btn btn-primary mt-3 " type="submit">Utwórz</button>         </div>
+
+
+        <p class="mt-3"></p>
+        </div>
+</EditForm>
+</div>
+
+@code {
+    private Producent[] producenci;
+  
+    private Magazyn[] magazyny;
+    private Produkt produkt = new();
+    private Magazyn magazyn = new();
+    string c { get; set; } = "";
+    string Cena
+    {
+        get => c;
+        set
+        {
+            c = value;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await produktyService.AddProdukt(produkt);
+
+        NavManager.NavigateTo("/produkty");
+    }
+
+    private void AddProducent()
+    {
+        NavManager.NavigateTo("/addproducent");
+    }
+
+    private void AddDostawca()
+    {
+        NavManager.NavigateTo("/adddostawca");
+    }    
+    
+    private void AddMagazyn()
+    {
+        NavManager.NavigateTo("/addmagazyn");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        if (przetargiService.isLogged == false)
+            NavManager.NavigateTo("/");
+        producenci = await produktyService.GetAllProducenciToList();
+        magazyny = await produktyService.GetAllMagazyny();
+        produkt.ProducentId = producenci.LastOrDefault()?.Id??0;
+
+
+
+        
+	}
+
+
+}

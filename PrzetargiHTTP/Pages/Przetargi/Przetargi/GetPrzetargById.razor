@@ -1,0 +1,308 @@
+﻿@page "/przetargi/{id}"
+@using InzynierkaAPI
+@using PrzetargiHTTP.Data
+@using InzynierkaAPI.Models
+@inject PrzetargiService ForecastService
+@inject NavigationManager NavManager
+@using System.IO
+@using Microsoft.CodeAnalysis.CSharp.Syntax
+@using Microsoft.CodeAnalysis.Differencing
+@inject IJSRuntime JS
+<button class="back-button btn-primary" onclick="@(() => NavManager.NavigateTo("#"))">
+    <i class="fa fa-arrow-left"></i>
+    Powrót
+</button>
+
+<style>
+    .back-button {
+        border: none;
+        border-radius: 3px;
+        padding: 10px 15px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+
+        .back-button i {
+            margin-right: 5px;
+        }
+</style>
+<div class="card mt-1">
+<h3 class="card-header">Dokument przetargowy</h3>
+ <div class="card-body">
+<div class="d-flex flex-row-reverse">
+            @if (przetarg.Status != Status.Zakonczony && przetarg.Status != Status.Anulowany && przetarg.Status != Status.Odrzucony && przetarg.Status != Status.Przegrany)
+            {
+
+                <EditForm Model="przetarg">
+                    
+                        
+                        @switch (przetarg.Status)
+                        {
+                            case Status.Niezweryfikowany:
+
+                            <InputSelect @bind-Value="status" class="form-control  px-1">
+                                <option value="" disabled selected>Wybierz status</option>
+
+                                    <option value="@Status.Odrzucony"> Odrzucony</option>
+                                    <option value="@Status.Wybrany"> Wybrany</option>
+                                </InputSelect>
+
+                                break;
+                            case Status.Wybrany:
+                            <InputSelect @bind-Value="status" class="form-control  px-1">
+                                <option value="" disabled selected>Wybierz status</option>
+
+                                    <option value="@Status.Wyslany"> Wyslany</option>
+                                    <option value="@Status.Anulowany"> Anulowany</option>
+                                </InputSelect>
+                                break;
+                            case Status.Wyslany:
+                            <InputSelect @bind-Value="status" class="form-control  px-1">
+                                <option value="" disabled selected>Wybierz status</option>
+
+                                    <option value="@Status.Realizowany"> Realizowany</option>
+                                    <option value="@Status.Przegrany"> Przegrany</option>
+                                    <option value="@Status.Anulowany"> Anulowany</option>
+                                </InputSelect>
+                                break;
+                            case Status.Realizowany:
+                            <InputSelect @bind-Value="status" class="form-control px-1">
+                                <option value="" disabled selected>Wybierz status</option>
+
+                                    <option value="@Status.Zakonczony"> Zakonczony</option>
+                                </InputSelect>
+                                break;
+
+                        }
+
+                    <button type="submit" class="btn btn-info mt-1  " @onclick="async () => await ForecastService.ZmienStatusPrzetargu(przetarg,przetarg.Id,status) ">Zmień Status</button>
+
+                </EditForm>
+            }
+    <div class="align-self-end">
+        <button class="btn btn-danger" @onclick="() => Delete(przetarg.Id)">Usuń</button>
+        <button class="btn btn-success me-1 px-1" @onclick="() => Edit(przetarg.Id)">Edytuj</button>
+
+</div>
+</div>
+
+
+<h5 class="card-title">Przedmiot ogłoszenia</h5><p class="card-text">@przetarg.PrzedmiotOgloszenia</p>
+<h5 class="card-title">Nazwa firmy</h5><p class="card-text">@wystawcaPrzetargu.Nazwa</p>
+<h5 class="card-title">Data wystawienia</h5><p class="card-text"> @przetarg.DataUtworzenia</p>
+<h5 class="card-title">Termin wysłania</h5><p class="card-text">@przetarg.DataPrzetargu</p>
+<h5 class="card-title">Lokalizacja</h5><p class="card-text">@przetarg.Lokalizacja</p>
+<h5 class="card-title">Notatki</h5><p class="card-text">@przetarg.Notatki</p>
+<h5 class="card-title">Status</h5> <span class="@ChangeColor(przetarg.Status,przetarg)">@przetarg.Status.ToString()</span>
+    </div>
+</div>
+<div class="card mt-2">
+    <h3 class="card-header">Załączniki</h3>
+    <div class="card-body">
+      <h5 class="mt-2">Wybierz kategorie pliku:</h5>
+        <EditForm Model="idKategorii">
+        <InputSelect @bind-Value="idKategorii" id="wystawcaIndex" class="form-control">
+            <option value="" disabled selected hidden>Wybierz kategorie pliku...</option>
+            @if (kategorieTablica != null)
+            {
+                @foreach (var kategoria in kategorieTablica)
+                {
+                    <option value="@kategoria.Id"> @kategoria.Nazwa</option>
+
+                }
+
+            }
+        </InputSelect>
+        </EditForm>
+        <button class="btn btn-link" @onclick="AddKategoria">Dodaj nową kategorie</button>
+        <input id="nazwa" @bind="Nazwa" class="form-control" name="nazwa" placeholder="Nazwa pliku" />
+<InputFile OnChange="@OnInputFileChange" class="form-control mt-1" />
+        <p class=@ChangeErrorColor()>@error</p>
+        <button @onclick="@UploadFile" class="btn btn-primary mt-1">Dodaj załącznik</button>
+
+<div class="mt-2"></div>
+@if (@przetarg.Pliki != null)
+{
+    <table class="mt-3">
+			<thead>
+			<tr>
+
+
+				<th>Kategoria</th>
+				<th>Nazwa</th>
+				<th colspan="2">Akcja</th>
+                
+
+
+			</tr>
+		</thead>
+		<tbody>
+    @foreach (var plik in @przetarg.Pliki)
+    {
+        <tr>
+                            <td> @plik.KategoriaPlik.Nazwa</td>
+                            <td><i class=@ChangeFileIcon(plik.Nazwa) aria-hidden="true"></i> @plik.Nazwa </td>
+                            <td> <button class="btn btn-success" @onclick="async () => await DownloadFileFromStream(plik.Id,plik.Nazwa)"> Pobierz </button> </td>
+                            <td> <button class="btn btn-danger" @onclick="async () => await DeleteFile(plik.Id)"> Usuń </button> </td>
+        </tr>
+        
+    }
+    </tbody>
+    </table>
+
+}
+
+    </div>
+</div>
+
+
+@code {
+    Status status;
+    int[] statusy = new int[] { 0, 1, 2, 3, 4, 5, 6 };
+    Przetarg przetarg= new();
+    WystawcaPrzetargu wystawcaPrzetargu = new();
+    KategoriaPlik kategoriaPliku = new();
+    KategoriaPlik[] kategorieTablica;
+    Plik plik= new();
+    private string error { get; set; } = string.Empty;
+    [Parameter]
+    public string id { get; set; }
+    private IBrowserFile file = null;
+    private string Nazwa { get; set; } = "";
+    private string rozszerzenie;
+    private int idKategorii { get; set; } = 0;
+    private string idP { get; set; } = " ";
+
+
+    private void AddKategoria()
+    {
+        NavManager.NavigateTo("/addkategoria");
+    }
+
+    private async Task DownloadFileFromStream(Guid guid,string nazwa)
+    {
+        var fileStream = await DownloadFile(guid);
+        var fileName = nazwa;
+
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        error = string.Empty;
+        file = e.File;
+        Nazwa = string.Empty;
+
+        rozszerzenie = "." + file.Name.Split(".").Last();
+        if (string.IsNullOrEmpty(Nazwa) & file!=null)
+            Nazwa = e.File.Name.Split(".").SkipLast(1).Aggregate((x, y) => x + y);
+
+        await Task.CompletedTask;
+    }
+
+
+    private async Task UploadFile()
+    {
+        if (file == null)
+        {
+            error = "Nie wybrano pliku.";
+        }
+        else
+        {
+            idP = idKategorii.ToString();
+            //dodac kategoria pliku ID zeby zczytywalo do pliku
+            error = await ForecastService.DodajPlik(id, Nazwa + rozszerzenie, idP, file);
+            //if(error.Contains(string.Empty))
+            //NavManager.NavigateTo($"/getprzetarg/{id}", forceLoad: true);
+            await OnInitializedAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task<Stream> DownloadFile(Guid plikId)
+    {
+        return await ForecastService.GetPlikById(plikId);
+
+    }
+
+    private async Task Delete(int id){
+        await ForecastService.DeletePrzetarg(id);
+        NavManager.NavigateTo("/przetargi");
+    }   
+    private void Edit(int id){
+        NavManager.NavigateTo($"/editprzetarg/{id}");
+    }    
+
+    private async Task DeleteFile(Guid id){
+        await ForecastService.DeleteFile(id);
+        await OnInitializedAsync();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        if (ForecastService.isLogged == false)
+            NavManager.NavigateTo("/");
+        int Id = Int32.Parse(id);
+        przetarg = await ForecastService.GetPrzetargById(Id);
+        kategorieTablica = await ForecastService.GetKategoriePliku();
+        idKategorii = kategorieTablica.LastOrDefault()?.Id ?? 0;
+        if(przetarg!=null){
+            wystawcaPrzetargu = await ForecastService.GetWystawcaById(przetarg.WystawcaPrzetarguId);
+            przetarg.Pliki = przetarg.Pliki.OrderByDescending(x => x.KategoriaPlikId).ToArray();
+
+        }
+    }
+    private string ChangeColor(Status status, Przetarg przetarg)
+    {
+        if (przetarg.Status == Status.Niezweryfikowany)
+            return "badge bg-primary";
+        if (przetarg.Status == Status.Wybrany)
+            return "badge bg-info";
+        if (przetarg.Status == Status.Odrzucony)
+            return "badge bg-secondary";
+        if (przetarg.Status == Status.Wyslany)
+            return "badge bg-warning";
+        if (przetarg.Status == Status.Anulowany)
+            return "badge bg-danger";
+        if (przetarg.Status == Status.Realizowany)
+            return "badge bg-success";
+        if (przetarg.Status == Status.Przegrany)
+            return "badge bg-danger";
+        if (przetarg.Status == Status.Zakonczony)
+            return "badge bg-dark";
+        else
+            return "table-danger";
+    }
+
+    private string ChangeFileIcon(string nazwa)
+    {
+        if (nazwa.EndsWith("pdf"))
+            return "fa fa-file-pdf-o";
+        if (nazwa.EndsWith("docx") || nazwa.EndsWith("doc"))
+            return "fa fa-file-word-o";
+        if (nazwa.EndsWith("zip") || nazwa.EndsWith("rar"))
+            return "fa fa-file-archive-o";
+        if (nazwa.EndsWith("jpg") || nazwa.EndsWith("jpeg") || nazwa.EndsWith("png") || nazwa.EndsWith("bmp"))
+            return "fa fa-file-image-o";              
+        if (nazwa.EndsWith("xlt") || nazwa.EndsWith("xls") || nazwa.EndsWith("xlsx") || nazwa.EndsWith("xml") || nazwa.EndsWith("csv"))
+            return "fa fa-file-excel-o";
+        if (nazwa.EndsWith("pptx"))
+            return "fa fa-file-powerpoint-o";        
+        if (nazwa.EndsWith("txt"))
+            return "fa fa-file-text";
+        else
+        {
+            return "fa fa-file-o";
+        }
+    }
+
+    private string ChangeErrorColor()
+    {
+        if (error.Contains("Udało się, dodać plik."))
+            return "text-success";
+        else
+            return "text-danger";
+    }
+}

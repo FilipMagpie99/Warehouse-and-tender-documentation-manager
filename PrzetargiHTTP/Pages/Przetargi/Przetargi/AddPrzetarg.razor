@@ -1,0 +1,97 @@
+﻿@page "/addprzetarg"
+@using InzynierkaAPI
+@using InzynierkaAPI.Models
+@using PrzetargiHTTP.Data
+@inject PrzetargiService ForecastService
+@inject NavigationManager NavManager
+@inject IJSRuntime JS
+<div class="card border-primary">
+    <h3 class="card-header text-white bg-primary">Nowy przetarg</h3>
+<EditForm Model="@przetarg" OnValidSubmit="@HandleValidSubmit" class="form-inline  rounded shadow">
+        <div class="card-body">
+
+   <DataAnnotationsValidator />
+   <ValidationSummary />
+
+            <h5 class="card-title">Przedmiot ogłoszenia</h5>
+            <InputText @bind-Value="przetarg.PrzedmiotOgloszenia" class="form-control" name="Przedmiot ogłoszenia" />
+            <div class="row"></div>
+
+
+            <h5 class="mt-2 card-title">Organizator</h5>
+      <InputSelect  @bind-Value="przetarg.WystawcaPrzetarguId" id="wystawcaIndex" class="form-control">
+                    <option value="" disabled selected hidden>Wybierz wystawce...</option>
+                    @if (wystawcyTablica != null)
+                        {
+                            @foreach (var wystawca in wystawcyTablica)
+                            {
+                                    <option value="@wystawca.Id"> @wystawca.Nazwa</option>
+
+                            }
+
+                        }
+        </InputSelect>
+                <button class="btn btn-link" @onclick="AddWystawca">Dodaj nowego organizatora</button>
+            <div class="row"></div>
+
+
+            <h5 class="mt-2" card-title>Lokalizacja</h5>
+            <InputText  @bind-Value="przetarg.Lokalizacja" class="form-control" name="Lokalizacja" />
+               <div class="row"></div>
+
+            <h5 class="mt-2" card-title>Data wystawienia</h5>
+            <InputDate  class="form-control" @bind-Value="przetarg.DataUtworzenia" />
+
+            <div class="row"></div>
+
+            <h5 class="mt-2" card-title>Termin wysłania</h5>
+            <InputDate class="form-control bg-light" @bind-Value="przetarg.DataPrzetargu" />
+            <div class="row"></div>
+
+            <h5 class="mt-2" card-title>Notatki</h5>
+            <InputTextArea class="form-control bg-light" @bind-Value="przetarg.Notatki" />
+               <div class="row"></div>
+
+
+          @if(wystawcyTablica!=null && przetarg!=null){
+
+
+                    <button class="btn btn-primary mt-3 " type="submit">Utwórz</button>
+
+            <p class="mt-1"></p>
+            }
+        </div>
+
+</EditForm>
+</div>
+
+@code {
+    private WystawcaPrzetargu[] wystawcyTablica;
+    private Przetarg przetarg = new();
+
+    private async Task HandleValidSubmit()
+    {
+        await ForecastService.AddPrzetarg(przetarg);
+        NavManager.NavigateTo("/przetargi");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        if (ForecastService.isLogged == false)
+            NavManager.NavigateTo("/");
+        wystawcyTablica =  await ForecastService.GetAllWystawcyToList();
+        przetarg.DataUtworzenia = DateTime.Now;
+        przetarg.DataPrzetargu = DateTime.Now;
+        if(wystawcyTablica!=null)
+            przetarg.WystawcaPrzetarguId = wystawcyTablica.LastOrDefault()?.Id ?? 0;
+
+
+    }
+    
+    private void AddWystawca()
+    {
+        NavManager.NavigateTo("/addwystawca");
+    }
+
+
+
+}

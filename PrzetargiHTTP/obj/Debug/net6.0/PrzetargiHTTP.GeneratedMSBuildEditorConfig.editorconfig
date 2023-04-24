@@ -1,0 +1,145 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = PrzetargiHTTP
+build_property.RootNamespace = PrzetargiHTTP
+build_property.ProjectDir = C:\Users\srocz\Desktop\projekt\projekt\PrzetargiHTTP\
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\srocz\Desktop\projekt\projekt\PrzetargiHTTP
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Components/ModalDialog.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xNb2RhbERpYWxvZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Logowanie/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9nb3dhbmllXExvZ2luLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Logowanie/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9nb3dhbmllXFJlZ2lzdGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Dostawca/AddDostawca.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcRG9zdGF3Y2FcQWRkRG9zdGF3Y2EucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Dostawca/Dostawcy.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcRG9zdGF3Y2FcRG9zdGF3Y3kucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Dostawca/GetDostawcaById.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcRG9zdGF3Y2FcR2V0RG9zdGF3Y2FCeUlkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Magazyn/AddMagazyn.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcTWFnYXp5blxBZGRNYWdhenluLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Magazyn/GetProduktyByStrefa.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcTWFnYXp5blxHZXRQcm9kdWt0eUJ5U3RyZWZhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Magazyn/ZmienMagazyn.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcTWFnYXp5blxabWllbk1hZ2F6eW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Producent/AddProducent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcUHJvZHVjZW50XEFkZFByb2R1Y2VudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Producent/GetProducentById.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcUHJvZHVjZW50XEdldFByb2R1Y2VudEJ5SWQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Producent/Producenci.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcUHJvZHVjZW50XFByb2R1Y2VuY2kucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Produkty/AddKategoria.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcUHJvZHVrdHlcQWRkS2F0ZWdvcmlhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Produkty/AddProdukt.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcUHJvZHVrdHlcQWRkUHJvZHVrdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Produkty/GetProduktById.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcUHJvZHVrdHlcR2V0UHJvZHVrdEJ5SWQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Produkty/Produkty/Produkty.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVrdHlcUHJvZHVrdHlcUHJvZHVrdHkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Przetargi/Przetargi/AddPrzetarg.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJ6ZXRhcmdpXFByemV0YXJnaVxBZGRQcnpldGFyZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Przetargi/Przetargi/EditPrzetarg.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJ6ZXRhcmdpXFByemV0YXJnaVxFZGl0UHJ6ZXRhcmcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Przetargi/Przetargi/GetPrzetargById.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJ6ZXRhcmdpXFByemV0YXJnaVxHZXRQcnpldGFyZ0J5SWQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Przetargi/Przetargi/Przetargi.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJ6ZXRhcmdpXFByemV0YXJnaVxQcnpldGFyZ2kucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Przetargi/Wystawca/AddWystawcaPrzetargu.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJ6ZXRhcmdpXFd5c3Rhd2NhXEFkZFd5c3Rhd2NhUHJ6ZXRhcmd1LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Przetargi/Wystawca/GetWystawcaById.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJ6ZXRhcmdpXFd5c3Rhd2NhXEdldFd5c3Rhd2NhQnlJZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Przetargi/Wystawca/WystawcyPrzetargu.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJ6ZXRhcmdpXFd5c3Rhd2NhXFd5c3Rhd2N5UHJ6ZXRhcmd1LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-ikfqq3xtvo
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-nz1c0uh43y
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/srocz/Desktop/projekt/projekt/PrzetargiHTTP/Pages/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

@@ -1,0 +1,328 @@
+﻿@page "/getprodukt/{id}"
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@using InzynierkaAPI
+@using PrzetargiHTTP.Data
+@using InzynierkaAPI.Models
+@inject ProduktyService produktyService
+@inject NavigationManager NavManager
+@inject PrzetargiService przetargiService
+@inject IJSRuntime JS
+
+<button class="back-button btn-primary" onclick="@(() => NavManager.NavigateTo("/produkty"))">
+    <i class="fa fa-arrow-left"></i>
+    Powrót
+</button>
+
+<style>
+    .back-button {
+        border: none;
+        border-radius: 3px;
+        padding: 10px 15px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+
+        .back-button i {
+            margin-right: 5px;
+        }
+</style>
+<div class="card mt-1">
+    <div class="card-header d-flex align-items-center">
+        <h3 class="m-0">Karta produktu</h3>
+        <button class="btn btn-success ms-2" @onclick="async () => await DownloadFileFromStream(produkt.Id)">
+            Pobierz Kod QR  <i class="fa fa-qrcode"></i>
+        </button>        
+        <button class="btn btn-danger ml-auto" @onclick="async () => await DeleteProdukt(produkt.Id)">
+            Usuń produkt <i class="fa fa-trash"></i>
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-6">
+                <h5>Nazwa produktu</h5>
+                <p>@produkt.Nazwa</p>
+            </div>
+            <div class="col-6">
+                <h5>Jednostka miary</h5>
+                <p>@produkt.JednostkaMiary</p>
+            </div>
+        </div>
+        <h5>Całkowita ilość</h5>
+        <p>@produkt.Suma</p>
+    </div>
+</div>
+<br/>
+
+<div class="card">
+    <h3 class="card-header">Przyjmij produkt</h3>
+ <div class="card-body">
+            <EditForm Model="@formProdukt">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+                    <label>Ilość</label><InputNumber @bind-Value=formProdukt.Ilosc class="form-control" name="ilosc" placeholder="ilość" />
+               <label>Cena jednostkowa</label><InputNumber @bind-Value=formProdukt.CenaJednostkowa class="form-control" name="cena" placeholder="Cena jednostkowa" />
+                                   <label>Dostawca</label><InputSelect @bind-Value="raportMagazynu.DostawcaId" id="wystawcaIndex" class="form-control">
+                                <option value="" disabled selected hidden>Wybierz dostawce...</option>
+                                @if (dostawcy != null)
+                                {
+                                    @foreach (var dostawca in dostawcy)
+                                    {
+                                        <option value="@dostawca.Id"> @dostawca.Nazwa</option>
+
+                                    }
+
+                                }
+                            </InputSelect>
+                            <input type="button" class="btn btn-link" value="Dodaj nowego dostawce" @onclick="AddDostawca" />  
+                            <br />
+                            <label class="mt-1">Strefa</label><InputSelect @bind-Value="raportMagazynu.StrefaId" id="wystawcaIndex" class="form-control">
+                                <option value="" disabled selected hidden>Wybierz Strefe...</option>
+                                @if (magazyn != null)
+                                {
+                                    @foreach (var strefa in magazyn.Strefa)
+                                    {
+                        <option value="@strefa.Id">@magazyn.Nazwa : @strefa.Nazwa</option>
+                        
+                                    }
+
+                                }
+                            </InputSelect>
+                    <button disabled="@(!context.Validate())" class="btn btn-primary btn-primary mt-3" @onclick="async () => await Plus(raportMagazynu)" type="submit">Przyjmij </button>
+                </EditForm>
+                </div>
+</div>
+<br />
+
+<div class="card">
+    <h3 class="card-header">Wydaj produkt</h3>
+ <div class="card-body">
+     <EditForm EditContext="@editContext">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+                      <p class="text-danger">@error</p>
+                    <label>Ilość</label><InputNumber @bind-Value=formWydanie.Ilosc class="form-control" name="ilosc" placeholder="ilość" />
+                                  
+                            <br />
+                            <label class="mt-1">Strefa</label>
+                            <InputSelect @bind-Value="raportMagazynu.StrefaId"  id="wystawcaIndex" class="form-control">
+                                @if (magazyn != null)
+                                {
+            <option value="">Wybierz strefe...</option>
+                                    @foreach (var strefa in magazyn.Strefa)
+                                    {
+                
+                int iloscWStrefie = produkt.RaportMagazynu.Where(x => x.StrefaId == strefa.Id).Where(x => x.TypOperacji == TypOperacji.Przyjecie).Select(x => x.Ilosc).Sum()
+                                     - produkt.RaportMagazynu.Where(x => x.StrefaId == strefa.Id).Where(x => x.TypOperacji == TypOperacji.Wydanie).Select(x => x.Ilosc).Sum();
+                                     if(iloscWStrefie>0){
+                            <option value="@strefa.Id">@magazyn.Nazwa : @strefa.Nazwa (@iloscWStrefie)</option>
+
+                                    }
+                                    }
+
+                                }
+                            </InputSelect>
+                   <button disabled="@(!editContext.Validate())" class="btn btn-primary btn-primary mt-3" @onclick="async () => await Minus(raportMagazynu)" type="submit"> Wydaj</button>
+
+
+
+                </EditForm>
+                     </div>
+</div>     
+<br />
+
+    <h3>Historia</h3>
+
+@if (historia != null)
+
+{
+    <table class="mt-2">
+		<thead>
+			<tr>
+				<th>Typ operacji</th>
+				<th>Ilość</th>
+				<th>Cena jednostkowa</th>
+                <th>Dostawca</th>
+                <th>Strefa</th>
+				<th>Nazwa użytkownika</th>
+			</tr>
+		</thead>
+		<tbody>
+            @foreach (var operacja in historia)
+            {
+                <tr>
+                <td>@operacja.TypOperacji</td>
+                <td>@operacja.Ilosc</td>
+                <td>
+                        @if(operacja.CenaJednostkowa == 0)
+                        {
+                            <p>-</p>
+                        }
+                        else
+                        {
+                            @operacja.CenaJednostkowa
+                        }
+                    </td>
+                    <td>
+                    @if (operacja.Dostawca == null)
+                    {
+                        <p>-</p>
+                    }
+                    else{
+                    @operacja.Dostawca.Nazwa
+                        }
+                    </td>
+                    <td>@operacja.Strefa.Nazwa</td>
+                <td>@operacja.User.Username</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    
+<div class="container">
+    <div class="row">
+            <div class="col"></div>
+			<div class="col"><button class="btn oi oi-arrow-left" @onclick="PrevPage"></button></div>
+			<div class="col"><p>@Strona</p></div>
+			<div class="col">	<button class="btn oi oi-arrow-right" @onclick="NextPage"></button></div>
+
+		</div>
+	</div>
+		
+        
+}
+@code {
+    [Parameter]
+    public string id { get; set; }
+    public int iloscWybranyMagazyn { get; set; }
+    private Dostawca[] dostawcy;
+    public string operation { get; set; }
+    public string error { get; set; } = string.Empty;
+    public string iloscProduktu{ get; set; }
+    private FormProdukt formProdukt = new();
+    InzynierkaAPI.Models.FormWydanie formWydanie = new();
+    private Magazyn magazyn;
+    private int cookieContent{ get; set; }
+    Plik Qr = new();
+    InzynierkaAPI.Models.Produkt produkt=new();
+    InzynierkaAPI.Models.RaportMagazynu raportMagazynu=new();
+    InzynierkaAPI.Models.RaportMagazynu[] historia;
+    private EditContext? editContext;
+
+    public int Strona
+    {
+        get => strona;
+        set
+        {
+            if (value < 1)
+            {
+                return;
+            }
+            strona = value;
+            GetAll(null, null);
+        }
+    }
+    private int strona = 1;
+
+    private void NextPage() => Strona++;
+    private void PrevPage() => Strona--;
+
+    private async void GetAll(MouseEventArgs e, object sender)
+    {
+        historia = null;
+        StateHasChanged();
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+    private void AddDostawca()
+    {
+        NavManager.NavigateTo("/adddostawca");
+    }
+
+    private async Task Plus(RaportMagazynu raportMagazynu)
+    {
+        error = string.Empty;
+        raportMagazynu.Ilosc = formProdukt.Ilosc;
+        raportMagazynu.CenaJednostkowa = formProdukt.CenaJednostkowa;
+        raportMagazynu.TypOperacji = TypOperacji.Przyjecie;
+        raportMagazynu.DostawcaId = dostawcy.LastOrDefault()?.Id ?? 0;
+        await produktyService.ChangeProdukt(raportMagazynu);
+        await OnInitializedAsync();
+    }    
+    private async Task Minus(RaportMagazynu raportMagazynu)
+    {
+        // jak jest ostatni na liscie to sie nie wydaje
+        error = string.Empty;
+        raportMagazynu.Ilosc = formWydanie.Ilosc;
+        raportMagazynu.CenaJednostkowa = 0;
+        raportMagazynu.TypOperacji = TypOperacji.Wydanie;
+        StateHasChanged();
+        error = await produktyService.ChangeProdukt(raportMagazynu);
+        await OnInitializedAsync();
+
+    }
+    private async Task DownloadFileFromStream(int id)
+    {
+        var fileStream = await DownloadFile(id);
+
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", "kodQR.png", streamRef);
+    }
+
+    private async Task DeleteProdukt(int id)
+    {
+        await produktyService.DeleteProdukt(id);
+        NavManager.NavigateTo("/produkty");
+    }
+
+    private async Task<Stream> DownloadFile(int id)
+    {
+        return await produktyService.GetProduktQrById(id);
+
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (przetargiService.isLogged == false)
+            NavManager.NavigateTo("/");
+        int Id = Int32.Parse(id);
+        var tryProdukt = await produktyService.GetProduktById(Id);
+        if (tryProdukt == null)
+            NavManager.NavigateTo("/");
+        else{
+            produkt = tryProdukt;
+            dostawcy = await produktyService.GetAllDostawcyToList();
+        historia = await produktyService.GetRaportMagazynuByProdukt(Id,Strona);
+        raportMagazynu.ProduktId = produkt.Id;
+        }
+    }
+    protected override void OnInitialized()
+    {
+        editContext = new(formWydanie);
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(magazyn==null){
+            string cookie = await localStorage.GetItemAsync<string>("idMagazynu");
+            bool czyWybrany = int.TryParse(cookie, out int wybrany);
+            if (wybrany == 0)
+                czyWybrany = false;
+
+        if (czyWybrany)
+        {
+        magazyn = await produktyService.GetMagazynById(wybrany);
+        raportMagazynu.StrefaId = magazyn.Strefa.LastOrDefault()?.Id ?? 0;
+        StateHasChanged();
+        }
+        else
+        {
+            NavManager.NavigateTo("/zmienmagazyn");
+        }
+        }
+    }
+}

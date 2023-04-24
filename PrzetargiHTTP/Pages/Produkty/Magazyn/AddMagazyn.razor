@@ -1,0 +1,42 @@
+﻿@page "/addkategoria"
+@using InzynierkaAPI
+@using InzynierkaAPI.Models
+@using PrzetargiHTTP.Data
+@inject ProduktyService produktyService;
+@inject PrzetargiService przetargiService;
+@inject NavigationManager NavManager
+
+<div class="card">
+    <h3 class="card-header">Nowa kategoria pliku</h3>
+    <div class="card-body">
+
+    <EditForm Model="@kategoriaPlik" OnValidSubmit="@HandleValidSubmit">
+        <div class="form-group">
+            <div class="form-row">
+
+            <h5 class="mt-2">Nazwa</h5>
+            </div>
+                <InputText @bind-Value="kategoriaPlik.Nazwa" name="Nazwa" Required />
+            <div class="form-row">
+                <button class="btn btn-info mt-3 " type="submit">Utwórz</button>
+            </div>
+        </div>
+    </EditForm>
+    </div>
+
+</div>
+
+@code {
+	private KategoriaPlik kategoriaPlik = new();
+
+	private async Task HandleValidSubmit(){
+		await produktyService.AddKategoria(kategoriaPlik);
+		NavManager.NavigateTo("/przetargi");
+	}
+	protected override async Task OnInitializedAsync()
+	{
+		if (przetargiService.isLogged == false)
+			NavManager.NavigateTo("/");
+		await Task.CompletedTask;
+	}
+}

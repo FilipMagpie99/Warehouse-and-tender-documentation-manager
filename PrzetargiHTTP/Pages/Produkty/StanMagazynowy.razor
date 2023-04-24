@@ -1,0 +1,80 @@
+﻿@page "/stanmagazynowy"
+@using InzynierkaAPI
+@using PrzetargiHTTP.Data
+@using InzynierkaAPI.Models
+@inject ProduktyService produktyService
+@inject PrzetargiService przetargiService
+@inject NavigationManager NavManager
+@inject IJSRuntime jsr
+
+<h3>Stan magazynowy</h3>
+
+@if (produkty == null)
+{
+	<p><em>Loading...</em></p>
+	
+}
+else
+{
+
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				
+				
+				<th>Nazwa</th>
+				<th>Cena jednostkowa</th>
+				<th>Ilość</th>
+				<th>Jednostka miary</th>
+				<th>Suma</th>
+				<th> </th>
+		
+			</tr>
+		</thead>
+		<tbody>
+
+			@foreach (var produkt in produkty)
+			{
+				@if (produkt.Ilosc != 0)
+				{
+					<tr>
+
+
+						<td>@produkt.Nazwa </td>
+						<td>@produkt.CenaJednostkowa</td>
+						<td>@produkt.Ilosc</td>
+						<td>@produkt.JednostkaMiary</td>
+						<td>@produkt.Suma</td>
+
+						<td><button class="btn btn-primary" @onclick="() => GetByIdProduktu(produkt.Id)">Zmień stan magazynowy</button></td>
+						@*	<td><button class="btn btn-danger" @onclick="() => Delete(przetarg.Id)">Usuń</button></td>*@
+
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+	private InzynierkaAPI.Models.Produkt[] produkty;
+
+	string userdata;
+
+	private void GetByIdProduktu( int id) { 
+		
+		NavManager.NavigateTo($"/Produkt/{id}");
+	}
+	private void AddNewProduct(){
+		NavManager.NavigateTo("/produkty");
+	}
+	protected override async Task OnInitializedAsync()
+	{
+		if (przetargiService.isLogged == false)
+			NavManager.NavigateTo("/");
+
+		produkty = await produktyService.GetAllProdukty();
+	}
+
+
+}

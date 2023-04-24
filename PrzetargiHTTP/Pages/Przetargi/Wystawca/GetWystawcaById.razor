@@ -1,0 +1,90 @@
+﻿@page "/Wystawca/{id}"
+@inject PrzetargiHTTP.Data.PrzetargiService przetargiService;
+@inject NavigationManager NavManager
+
+
+@if (wystawcaPrzetargu != null && przetargiWystawcy != null)
+{
+		<div class="card">
+		<h3 class="card-header">Organizator przetargu</h3>
+			 <div class="card-body">
+	<button class="btn btn-danger" @onclick="() => Delete(wystawcaPrzetargu.Id)">Usuń</button>
+	<h5 class="mt-4">Nazwa</h5><p>@wystawcaPrzetargu.Nazwa</p>
+			<h5>Nip</h5><p>@wystawcaPrzetargu.Nip</p>
+			<h5>Krs</h5><p>@wystawcaPrzetargu.Krs</p>
+			<h5>Ulica</h5><p>@wystawcaPrzetargu.Ulica</p>
+			<h5>Numer domu</h5><p>@wystawcaPrzetargu.NrDomu</p>
+			<h5>Kod pocztowy</h5><p>@wystawcaPrzetargu.KodPocztowy</p>
+			<h5>Miejscowość</h5><p>@wystawcaPrzetargu.Miejscowosc</p>
+
+
+	<h5>Przetargi organizatora: </h5>
+	<table class="mt-3">
+		<thead>
+			<tr>
+
+				<th>Przedmiot ogłoszenia</th>
+				<th>Data Utworzenia</th>
+				<th>Data Przetargu</th>
+				<th>Lokalizacja</th>
+				<th>Status</th>
+				<th> </th>
+				
+
+
+
+			</tr>
+		</thead>
+		<tbody>
+
+			@foreach (var przetarg in przetargiWystawcy)
+			{
+				<tr>
+
+
+					<td>@przetarg.PrzedmiotOgloszenia</td>
+					<td>@przetarg.DataUtworzenia</td>
+					<td>@przetarg.DataPrzetargu</td>
+					<td>@przetarg.Lokalizacja</td>
+					<td>@przetarg.Status</td>
+					<td><button class="btn btn-link" @onclick="() => GetbyId(przetarg.Id)">Szczegóły</button></td>
+
+				</tr>
+			}
+		</tbody>
+	</table>
+	</div>
+	</div>
+
+}
+else{
+	<p><em>Ładowanie...</em></p>
+}
+@code {
+	public InzynierkaAPI.Models.WystawcaPrzetargu wystawcaPrzetargu = new();
+	InzynierkaAPI.Models.Przetarg[] przetargiWystawcy;
+
+	[Parameter]
+	public string id { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (przetargiService.isLogged == false)
+			NavManager.NavigateTo("/");
+		int Id = Int32.Parse(id);
+        wystawcaPrzetargu = await przetargiService.GetWystawcaById(Id);
+		if(wystawcaPrzetargu!=null)
+		przetargiWystawcy = await przetargiService.GetAllPrzetargiByWystawca(wystawcaPrzetargu.Id);
+    }
+
+	private void GetbyId(int id)
+	{
+
+		NavManager.NavigateTo($"/przetargi/{id}");
+	}
+	private async Task Delete(int id)
+	{
+		await przetargiService.DeleteWystawca(id);
+		NavManager.NavigateTo("/wystawcy");
+	}
+}

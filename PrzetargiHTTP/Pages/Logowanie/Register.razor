@@ -1,0 +1,52 @@
+﻿@page "/rejestrujkonto"
+@using InzynierkaAPI
+@using InzynierkaAPI.Models
+@using PrzetargiHTTP.Data
+@inject PrzetargiService ForecastService
+@inject NavigationManager NavManager
+
+<EditForm Model="@user" OnValidSubmit="@HandleValidSubmit" class="form-inline border border-dark rounded shadow">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	
+	<h3 class="top-row text-center bg-primary text-white">Rejestracja nowego użytkownika</h3>
+	 <div class="row justify-content-center">
+		<p class="text-danger">@error.Trim('\"')</p>
+		<div class="row justify-content-center"><div class="col-7"><h5 class ="mt-1">Nazwa użytkownika</h5><InputText @bind-Value="user.Username" class="form-control" name="Nazwa firmy" /> </div></div>
+		<div class="row justify-content-center"><div class="col-7"><h5 class="mt-1">Adres email</h5> <InputText  @bind-Value="user.EmailAdress" class="form-control" name="Lokalizacja" /> </div></div>
+		<div class="row justify-content-center"><div class="col-7"><h5 class="mt-1">Imię</h5> <InputText  @bind-Value="user.GivenName" class="form-control" name="Lokalizacja" /> </div></div>
+		<div class="row justify-content-center"><div class="col-7"><h5 class="mt-1">Nazwisko</h5> <InputText  @bind-Value="user.Surname" class="form-control" name="Lokalizacja" /> </div></div>
+		<div class="row justify-content-center"><div class="col-7"><h5 class="mt-1">Hasło</h5> <InputText  @bind-Value="user.Password" class="form-control" name="Lokalizacja" /> </div></div>
+
+
+		<div class="row align-content-sm-end">
+			<button class="btn btn-primary btn-primary mt-3 " type="submit">Zarejestruj się</button>
+			</div>
+	</div>
+	
+</EditForm>
+
+@code {
+	private User user = new();
+	private string error = string.Empty;
+	private async Task HandleValidSubmit(){
+		error = string.Empty;
+		user.Role = "Administrator";
+		user.Id = new Guid();
+		error = await ForecastService.Register(user);
+		if (error != string.Empty)
+		{
+
+		}
+		else
+		{
+			NavManager.NavigateTo("");
+		}
+	}
+	protected override void OnInitialized()
+	{
+
+	}
+
+
+}

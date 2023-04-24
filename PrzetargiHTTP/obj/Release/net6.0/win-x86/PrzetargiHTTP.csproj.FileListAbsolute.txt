@@ -1,0 +1,9 @@
+C:\Users\srocz\Desktop\Inżynierka\projekt\PrzetargiHTTP\obj\Release\net6.0\win-x86\PrzetargiHTTP.csproj.AssemblyReference.cache
+C:\Users\srocz\Desktop\Inżynierka\projekt\PrzetargiHTTP\obj\Release\net6.0\win-x86\PrzetargiHTTP.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\srocz\Desktop\Inżynierka\projekt\PrzetargiHTTP\obj\Release\net6.0\win-x86\PrzetargiHTTP.AssemblyInfoInputs.cache
+C:\Users\srocz\Desktop\Inżynierka\projekt\PrzetargiHTTP\obj\Release\net6.0\win-x86\PrzetargiHTTP.AssemblyInfo.cs
+C:\Users\srocz\Desktop\Inżynierka\projekt\PrzetargiHTTP\obj\Release\net6.0\win-x86\PrzetargiHTTP.csproj.CoreCompileInputs.cache
+C:\Users\srocz\Desktop\Inżynierka\projekt\PrzetargiHTTP\obj\Release\net6.0\win-x86\PrzetargiHTTP.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\srocz\Desktop\Inżynierka\projekt\PrzetargiHTTP\obj\Release\net6.0\win-x86\PrzetargiHTTP.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\srocz\Desktop\Inżynierka\projekt\PrzetargiHTTP\obj\Release\net6.0\win-x86\PrzetargiHTTP.RazorAssemblyInfo.cache
+C:\Users\srocz\Desktop\Inżynierka\projekt\PrzetargiHTTP\obj\Release\net6.0\win-x86\PrzetargiHTTP.RazorAssemblyInfo.cs

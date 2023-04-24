@@ -1,0 +1,156 @@
+﻿@page "/zmienmagazyn"
+@using InzynierkaAPI
+@using InzynierkaAPI.Models
+@using PrzetargiHTTP.Data
+@inject ProduktyService produktyService;
+@inject PrzetargiService przetargiService;
+@inject NavigationManager NavManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+<div class="card">
+    <h2 style="background-color:#800000
+ ;" class="card-header text-white">Zmień magazyn</h2>
+    <div class="card-body">
+@if (cookieMagazyn != null)
+{
+    <p> Wybrany magazyn: @cookieMagazyn.Nazwa</p>
+}
+else
+{
+    <p>Nie wybrano magazynu.</p>
+}
+@if(magazyny!=null){
+<EditForm Model="@wybranyMagazyn" OnValidSubmit=@ChangeMagazyn>
+	      <InputSelect @bind-Value="wybranyMagazyn.Id" id="magazynId" class="form-control">
+                    <option value="" disabled selected hidden>Wybierz magazyn...</option>
+                    @if (magazyny != null)
+                        {
+                        @foreach (var magazyn in magazyny)
+                            {
+                                    <option  value="@magazyn.Id"> @magazyn.Nazwa</option>
+
+                            }
+
+                        }
+        </InputSelect>
+                <div class="mt-2"></div>
+        <button class="btn btn-primary" type="submit" disabled="@(!context.Validate())">Zmień</button>
+</EditForm>
+}
+@if (wybranyMagazyn != null && magazyn!=null)
+{
+        <h5 class="class-title mt-4">Nazwa</h5>
+
+            <p class="card-text">@magazyn.Nazwa</p>
+        <h5 class="class-title">Adres</h5>
+
+            <p class="card-text">@magazyn.Ulica</p>
+            <h5 class="class-title">Numer domu</h5>
+
+            <p class="card-text">@magazyn.NrDomu</p>
+            <h5 class="class-title">Kod pocztowy</h5>
+
+            <p class="card-text">@magazyn.KodPocztowy</p>
+            <h5 class="class-title">Miejscowosc</h5>
+
+            <p class="card-text">@magazyn.Miejscowosc</p>
+
+
+
+
+            <EditForm Model="@strefa">
+            <h5 class="mt-2 " >Nazwa strefy</h5>
+            <InputText @bind-Value="strefa.Nazwa"></InputText>
+            <button class="btn btn-primary mt-2 mb-2" @onclick="async() => await AddStrefa()"type="submit">Dodaj</button>
+            </EditForm>
+        <h5>Strefy w Magazynie: </h5>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                        <th style="background-color:#800000
+ ;">Nazwa</th>
+                        <th style="background-color:#800000
+ ;">Produkty</th>
+
+                </tr>
+            </thead>
+            <tbody>
+
+            @foreach (var strefa in magazyn.Strefa)
+            {
+                        <tr>
+                            <td>@strefa.Nazwa</td>
+                        <td><button class="btn btn-link" @onclick=" () =>  GetProduktyByStrefa(strefa.Id)">Szczegóły</button></td>
+
+                        </tr>
+            }
+            </tbody>
+        </table>
+
+
+}
+</div>
+</div>
+@code {
+    private Magazyn[] magazyny { get; set; }
+    private Magazyn wybranyMagazyn { get; set; } = new();
+    private Magazyn magazyn { get; set; }
+    private Magazyn cookieMagazyn { get; set; }
+    public InzynierkaAPI.Models.Strefa strefa = new();
+
+
+    private void  GetProduktyByStrefa(int idStrefy)
+    {
+        NavManager.NavigateTo($"/getproduktybystrefa/{idStrefy}");
+    }
+    private async Task AddStrefa()
+    {
+        magazyn.Strefa.Add(strefa);
+        await produktyService.EditMagazyn(magazyn);
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (przetargiService.isLogged == false)
+			NavManager.NavigateTo("/");
+        magazyny = await produktyService.GetAllMagazyny(); 
+        if (magazyny != null && await localStorage.GetItemAsync<string>("idMagazynu") != null)
+        {
+            magazyn = await produktyService.GetMagazynById(int.Parse(await localStorage.GetItemAsync<string>("idMagazynu")));
+            
+
+        }
+        wybranyMagazyn.Id = magazyny.LastOrDefault()?.Id ?? 0;
+    }
+
+    private async Task ChangeMagazyn()
+    {
+        await localStorage.SetItemAsync("idMagazynu", wybranyMagazyn.Id.ToString());
+        magazyn = await produktyService.GetMagazynById(wybranyMagazyn.Id); 
+        StateHasChanged();
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var cookieContent = await localStorage.GetItemAsync<string>("idMagazynu");
+
+        if (!string.IsNullOrEmpty(cookieContent) && magazyny!=null)
+        {
+            cookieMagazyn = magazyny.SingleOrDefault(x => x.Id == int.Parse(cookieContent));
+            StateHasChanged();
+        }
+
+    }
+    private async Task Delete(int id)
+    {
+        await produktyService.DeleteMagazyn(id);
+        NavManager.NavigateTo("/produkty");
+    }
+
+
+
+}

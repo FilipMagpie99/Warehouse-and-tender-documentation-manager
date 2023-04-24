@@ -1,0 +1,198 @@
+﻿@page "/producenci"
+@using InzynierkaAPI
+@using PrzetargiHTTP.Data
+@using InzynierkaAPI.Models
+@inject PrzetargiService przetargiService
+@inject ProduktyService produktyService
+@inject NavigationManager NavManager
+@inject IJSRuntime jsr
+
+
+@if (producenci == null)
+{
+	<div class="d-flex align-items-center justify-content-center" style="height: 80vh">
+		<div style="max-width:500px;">
+			<p><h4> <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Ładowanie...</h4></p>
+		</div>
+	</div>
+}
+else
+{
+			<div class="card">
+		<h2 class="card-header text-white" style="background-color: #5c3b27 ;">Producenci</h2>
+
+		<div class="row">
+			<div class="col ">
+				<button class="btn btn-primary ms-2 mt-2" @onclick="DodajProducenta">Dodaj producenta</button>
+
+</div>
+				<div class="col"></div>
+				<div class="col">
+				<div class="mt-2"></div>
+
+						<EditForm Model="parametr1">
+						<input class="form-control mr-sm-2" type="search" placeholder="Nazwa firmy lub Miejscowość" @bind-value="parametr1.nazwaDostawcy" aria-label="Search">
+						<input class="form-control mr-sm-2" type="search" placeholder="Numer NIP lub KRS" @bind-value="parametr1.nip" aria-label="Search">
+		<div class="mt-2"></div>
+						<button class="btn btn-secondary my-2 my-sm-0 mt-2" type="submit" @onclick="async () => await FindProducent(parametr1.nazwaDostawcy,parametr1.nip)">Szukaj <i class="fa fa-search"></i></button>
+					<button class="btn btn-secondary my-2 my-sm-0 mt-2" type="submit" @onclick=@Reset>Resetuj <i class="fa fa-refresh"></i></button>
+		</EditForm>
+				</div>
+
+			<div class="col"></div>
+
+				<div class="col mt-3 me-2">
+
+					<EditForm Model="itemsOnPage">
+						<label>Ilość przetargów na stronie: </label>
+						<InputSelect id="items" @bind-Value=itemsOnPage class="form-control" itemid="a">
+							<option value="5"> 5</option>
+							<option value="10"> 10</option>
+							<option value="20"> 20</option>
+							<option value="50"> 50</option>
+							<option value="100"> 100</option>
+						</InputSelect>
+						<button class="btn btn-primary mt-2" @onclick="async () => await OnValueChanged(itemsOnPage)">Zmień</button>
+					</EditForm>
+				</div>
+			</div>
+			<div class="row mt-2"></div>
+	<table>
+		<thead>
+			<tr>
+				
+
+					<th style="background-color: #5c3b27 ;">Nazwa firmy</th>
+					<th style ="background-color: #5c3b27 ;">Nip</th>
+					<th style ="background-color: #5c3b27 ;">Krs</th>
+					<th style="background-color: #5c3b27 ;">Ulica</th>
+					<th style="background-color: #5c3b27 ;">Numer domu</th>
+					<th style="background-color: #5c3b27 ;">Kod pocztowy</th>
+					<th style="background-color: #5c3b27 ;">Miejscowość</th>
+				<th style="background-color: #5c3b27 ;"> </th>
+
+
+
+			</tr>
+		</thead>
+		<tbody>
+
+			@foreach (var producent in producenci)
+			{
+				<tr>
+
+					<td>@producent.Nazwa</td>
+					<td>@producent.Krs</td>
+					<td>@producent.Nip</td>
+					<td>@producent.Ulica</td>
+					<td>@producent.NrDomu</td>
+					<td>@producent.KodPocztowy</td>
+					<td>@producent.Miejscowosc</td>
+						<td><button class="btn btn-primary btn-sm" @onclick="() => GetbyId(producent.Id)">Szczegóły</button></td>
+					</tr>
+			}
+		</tbody>
+	</table>
+		<div class="container">
+			<div class="row">
+				<div class="col">
+				</div>
+				<div class="col text-center">
+					<button class="btn oi oi-arrow-left" @onclick="PrevPage"></button>
+				</div>
+				<div class="col text-center">
+					<p class=" custom-font custom-size">@Strona</p>
+				</div>
+				<div class="col text-center">
+					<button class="btn oi oi-arrow-right" @onclick="NextPage"></button>
+				</div>
+				<div class="col">
+				</div>
+			</div>
+		</div>
+		</div>
+}
+@code {
+	private Producent[] producenci;
+	private Producent[] dostawcyLastPage;
+	public int Strona
+	{
+		get => strona;
+		set
+		{
+			if (value < 1)
+			{
+				return;
+			}
+			if (value > ostatniaStrona)
+			{
+				return;
+			}
+			strona = value;
+			GetAll(null, null);
+		}
+	}
+	private int strona = 1;
+	public class Parametr
+	{
+		public string nazwaDostawcy { get; set; }
+		public string nip { get; set; }
+	}
+	Parametr parametr1 = new();
+	private void NextPage() => Strona++;
+	private void PrevPage() => Strona--;
+	private int ostatniaStrona { get; set; }
+	private int itemsOnPage { get; set; } = 5;
+	private int iloscDostawcow { get; set; }
+	private async void GetAll(MouseEventArgs e, object sender)
+	{
+		producenci = null;
+		StateHasChanged();
+		await OnInitializedAsync();
+		StateHasChanged();
+	}
+	private async Task OnValueChanged(int value)
+	{
+		await produktyService.ChangeNumberOfItemsPro(value);
+		await OnInitializedAsync();
+		StateHasChanged();
+	}
+	private void GetbyId(int id)
+	{
+		NavManager.NavigateTo($"/Producent/{id}");
+	}
+
+	private void DodajProducenta()
+	{
+		NavManager.NavigateTo("/addproducent");
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (przetargiService.isLogged == false)
+			NavManager.NavigateTo("/");
+		producenci = await produktyService.GetAllProducenci(Strona);
+		dostawcyLastPage = await produktyService.GetAllProducenciToList();
+		iloscDostawcow = dostawcyLastPage.Length;
+		ostatniaStrona = (int)Math.Ceiling((double)iloscDostawcow / itemsOnPage);
+	}
+
+	private async Task Delete(int id)
+	{
+		await produktyService.DeleteProducent(id);
+		producenci = null;
+		await OnInitializedAsync();
+	}
+	public async void Reset()
+	{
+		parametr1.nazwaDostawcy = null;
+		parametr1.nip = null;
+		await FindProducent(null, null);
+		StateHasChanged();
+	}
+	private async Task FindProducent(string nazwaWystawcy, string nip)
+	{
+		producenci = await produktyService.FindProducent(Strona, nazwaWystawcy, nip);
+	}
+
+}

@@ -1,0 +1,103 @@
+﻿@page "/addproducent"
+@using InzynierkaAPI
+@using InzynierkaAPI.Models
+@using PrzetargiHTTP.Data
+@inject ProduktyService produktyService;
+@inject PrzetargiService przetargiService;
+@inject NavigationManager NavManager
+@inject IJSRuntime jsr
+
+<div class="card">
+	<h3 class="card-header bg-secondary text-white">Nowy producent</h3>
+<EditForm Model="@producent" OnValidSubmit="@HandleValidSubmit" class="form-inline rounded shadow">
+		<div class="card-body">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+
+								<p class="text-danger">@error?.Trim('\"')</p>
+
+				<div class="input-group mb-3 mt-3">
+					<input type="text" class="form-control" @bind="krsnumber" placeholder="Wprowadź numer KRS firmy, dane zostaną pobrane automatycznie" aria-describedby="basic-addon2">
+					<div class="input-group-append">
+						<input type="button" @onclick="async() => await DownloadFromKrs(krsnumber)" class="btn btn-danger" value="Pobierz dane z KRS" />
+					</div>
+				</div>
+
+
+				<h5 class="mt-2">Nazwa firmy</h5>
+				<InputText @bind-Value="producent.Nazwa" class="form-control" name="Nazwa firmy" />
+
+
+				<h5 class="mt-2">Krs</h5>
+				<InputText @bind-Value="producent.Krs" class="form-control" name="Krs" />
+
+
+				<h5 class="mt-2">Nip</h5>
+				<InputText @bind-Value="producent.Nip" class="form-control" name="Nip" />
+
+
+				<h5 class="mt-2">Ulica</h5>
+				<InputText class="form-control bg-light" @bind-Value="producent.Ulica" />
+	
+
+				<h5 class="mt-2">Numer domu</h5>
+				<InputText class="form-control bg-light" @bind-Value="producent.NrDomu" />
+
+
+				<h5 class="mt-2">Kod pocztowy</h5>
+				<InputText class="form-control bg-light" @bind-Value="producent.KodPocztowy" />
+
+				<h5 class="mt-2">Miejscowość</h5>
+				<InputText class="form-control bg-light" @bind-Value="producent.Miejscowosc" />
+			<div class="row"></div>
+
+			<button class="btn btn-secondary mt-3 " type="submit">Utwórz</button>
+	
+		<p class="mt-3"></p>
+</div>
+
+</EditForm>
+</div>
+@code {
+	private Producent producent = new();
+	private string krsnumber { get; set; }
+	private KrsApi krsApi = new();
+	private string error { get; set; }
+
+
+	private async Task HandleValidSubmit(){
+		error = string.Empty;
+		error = await produktyService.AddProducent(producent);
+		if(error == string.Empty)
+			GoBack();
+	}
+	private async void GoBack()
+	{
+		await jsr.InvokeVoidAsync("history.back");
+	}
+	protected override async Task OnInitializedAsync()
+	{
+		if (przetargiService.isLogged == false)
+			NavManager.NavigateTo("/");
+		await Task.CompletedTask;
+	}
+	private async Task DownloadFromKrs(string krsnumber){
+		error = string.Empty;
+		Object response = await przetargiService.GetFirmaFromKrs(krsnumber);
+		krsApi = response as KrsApi;
+		if (krsApi == null)
+			error = response as string;
+		else{
+		producent.Nazwa = krsApi.odpis.dane.dzial1.danePodmiotu.nazwa;
+		producent.Nip = krsApi.odpis.dane.dzial1.danePodmiotu.identyfikatory.nip;
+		producent.Krs = krsApi.odpis.naglowekA.numerKRS;
+		producent.Ulica = krsApi.odpis.dane.dzial1.siedzibaIAdres.adres.ulica;
+		producent.NrDomu = krsApi.odpis.dane.dzial1.siedzibaIAdres.adres.nrDomu;
+		producent.KodPocztowy = krsApi.odpis.dane.dzial1.siedzibaIAdres.adres.kodPocztowy;
+		producent.Miejscowosc = krsApi.odpis.dane.dzial1.siedzibaIAdres.adres.miejscowosc;
+		}
+	}
+
+
+}
