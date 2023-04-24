@@ -22,6 +22,7 @@ The Przetargi web application comes with the following features:
 A demo of the application is available at https://przetargi.azurewebsites.net/ 
 
 In order to access the application enter test user credentials login: User1, password: User1.
+
 Please note that the demo may not include all the features mentioned above, and some features may be limited.
 
 ## Getting Started
